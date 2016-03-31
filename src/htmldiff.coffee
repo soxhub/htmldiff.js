@@ -290,21 +290,20 @@ find_matching_blocks.create_index = create_index
 diff.calculate_operations = calculate_operations
 diff.render_operations = render_operations
 
-class HtmlDiff
-  constructor: ()->
-  diff: (from, to)->
-    return diff from to
+HtmlDiff = ()->
+HtmlDiff::diff = (from, to) ->
+  return diff from, to
 
-if exports?
-  if module? and module.exports?
-    exports = module.exports = HtmlDiff
+root = exports ? this
+root.HtmlDiff = HtmlDiff
 
-  exports.HtmlDiff = HtmlDiff
+if module? and module.exports?
+  root = module.exports = HtmlDiff
 
 else if typeof define is 'function' and define.amd?
   define [], ()-> HtmlDiff
 
 else if typeof window is 'object' and typeof window.document is 'object'
   window.HtmlDiff = HtmlDiff
-  window.htmldiff = new HtmlDiff
+  window.htmldiff = new HtmlDiff()
 
