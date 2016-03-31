@@ -290,9 +290,21 @@ find_matching_blocks.create_index = create_index
 diff.calculate_operations = calculate_operations
 diff.render_operations = render_operations
 
-if typeof define is 'function'
-  define 'htmldiff', [], ()-> diff
-else if module?
-  module.exports = diff
-else
-  this.htmldiff = diff
+class HtmlDiff
+  constructor: ()->
+  diff: (from, to)->
+    return diff from to
+
+if exports?
+  if module? and module.exports?
+    exports = module.exports = HtmlDiff
+
+  exports.HtmlDiff = HtmlDiff
+
+else if typeof define is 'function' and define.amd?
+  define [], ()-> HtmlDiff
+
+else if typeof window is 'object' and typeof window.document is 'object'
+  window.HtmlDiff = HtmlDiff
+  window.htmldiff = new HtmlDiff
+
