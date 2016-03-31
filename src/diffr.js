@@ -527,7 +527,7 @@
   };
 
   Diffr.prototype.textdiff = function(from, to) {
-    return textdiff.diff(from, to);
+    return textdiff.diffString(from, to);
   };  
   
   // nodejs
