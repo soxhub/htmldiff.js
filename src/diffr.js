@@ -1,4 +1,4 @@
-// Fuck coffeescript, seriously.  Going back to standard JS because CS is fucking stupid.
+// Back to Standard JS.  CoffeeScript is too much of a headache
 (function() {
   /**
     coffeescript compiled js from htmldiff.js npm module
@@ -339,9 +339,20 @@
 
   diff = function(before, after) {
     var ops;
+    
     if (before === after) {
       return before;
     }
+    
+    if (!before || !before.length) {
+      return '<ins>' + after + '</ins>';
+    }
+    
+    if (!after || !after.length) {
+      return '<del>' + before + '</del>';
+    }
+    
+    
     before = html_to_tokens(before);
     after = html_to_tokens(after);
     ops = calculate_operations(before, after);
