@@ -1,5 +1,5 @@
 {
-    "name": "htmldiff",
+    "name": "@soxhub/htmldiff",
     "version": "0.0.4",
     "description": "HTML Diffing in JavaScript (CoffeeScript)",
     "main": "./src/diffr.js",
@@ -8,10 +8,10 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/tnwinc/htmldiff.js.git"
+        "url": "git://github.com/soxhub/htmldiff.js.git"
     },
     "issues": {
-      "url": "https://github.com/tnwinc/htmldiff.js/issues"
+      "url": "https://github.com/soxhub/htmldiff.js/issues"
     },
     "keywords": [
         "diff",
@@ -25,6 +25,6 @@
         "chai": "*",
         "mocha": "*"
     },
-    "author": "The Network Inc.",
+    "author": "The Network Inc.; Kevin Jhangiani (AuditBoard)",
     "license": "MIT (Expat)"
 }
