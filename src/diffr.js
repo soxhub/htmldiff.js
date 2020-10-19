@@ -21,8 +21,16 @@
     return /^\s*<[^>]+>\s*$/.test(token);
   };
 
+  img_tag = function(token) {
+    return /^\s*<img[^>]+>\s*$/.test(token);
+  };
+
   isnt_tag = function(token) {
-    return !is_tag(token);
+    return !is_tag(token) || img_tag(token);
+  };
+
+  is_tag_except_img = function(token) {
+    return is_tag(token) && !img_tag(token);
   };
 
   Match = (function() {
@@ -300,7 +308,7 @@
       if (position >= length) {
         break;
       }
-      tags = consecutive_where(position, content, is_tag);
+      tags = consecutive_where(position, content, is_tag_except_img);
       position += tags.length;
       rendering += tags.join('');
     }
