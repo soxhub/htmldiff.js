@@ -347,20 +347,20 @@
 
   diff = function(before, after) {
     var ops;
-    
+
     if (before === after) {
       return before;
     }
-    
+
     if (!before || !before.length) {
       return '<ins>' + after + '</ins>';
     }
-    
+
     if (!after || !after.length) {
       return '<del>' + before + '</del>';
     }
-    
-    
+
+
     before = html_to_tokens(before);
     after = html_to_tokens(after);
     ops = calculate_operations(before, after);
@@ -385,74 +385,77 @@
   **/
 
   var textdiff = {
-    escape: function(s) {
-      var n = s;
-      n = n.replace(/&/g, "&amp;");
-      n = n.replace(/</g, "&lt;");
-      n = n.replace(/>/g, "&gt;");
-      n = n.replace(/"/g, "&quot;");
+		escape: function(str) {
+			return str
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;');
+		},
 
-      return n;
+		diffString: function( a, b ) {
+			const strA = a.replace(/\s+$/, '');
+			const strB = b.replace(/\s+$/, '');
+
+			const partsA = (strA && strA.split(/\s+/)) || [];
+			const partsB = (strB && strB.split(/\s+/)) || [];
+
+			const { a: diffA, b: diffB } = this.diff(partsA, partsB);
+
+			const spaceA = strA.match(/\s+/g) || [];
+			const spaceB = strB.match(/\s+/g) || [];
+
+			spaceA.push('\n');
+			spaceB.push('\n');
+
+			const tag = (type) => (str) => `<${type}>${str}</${type}>`;
+
+			const insTag = tag('ins');
+			const delTag = tag('del');
+
+			if (diffB.length === 0) {
+				return diffA.reduce((str, partA, i) => {
+					const htmlStr = delTag(`${this.escape(partA)}${spaceA[i]}`);
+					return `${str}${htmlStr}`;
+				}, '');
+			}
+
+			let str = '';
+
+			if (!diffB[0].text) {
+				str = diffA.reduce((subStr, partA, i) => {
+					if (partA.text) {
+						return subStr;
+					}
+					return subStr + delTag(`${this.escape(partA)}${spaceA[i]}`);
+				}, '');
+			}
+
+			diffB.forEach((partB, i) => {
+				if (!partB.text) {
+					str += insTag(`${this.escape(partB)}${spaceB[i]}`);
+					return;
+				}
+				str += ` ${this.escape(partB.text)}${spaceB[i]}`;
+
+				for (let j = partB.row + 1; j < diffA.length && !diffA[j].text; j++) {
+					str += delTag(`${this.escape(diffA[j])}${spaceA[j]}`);
+				}
+			});
+			return str;
     },
-    diffString: function( o, n ) {
-      o = o.replace(/\s+$/, '');
-      n = n.replace(/\s+$/, '');
 
-      var out = this.diff(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
-      var str = "";
-
-      var oSpace = o.match(/\s+/g);
-      if (oSpace == null) {
-        oSpace = ["\n"];
-      } else {
-        oSpace.push("\n");
-      }
-      var nSpace = n.match(/\s+/g);
-      if (nSpace == null) {
-        nSpace = ["\n"];
-      } else {
-        nSpace.push("\n");
-      }
-
-      if (out.n.length == 0) {
-          for (var i = 0; i < out.o.length; i++) {
-            str += '<del>' + this.escape(out.o[i]) + oSpace[i] + "</del>";
-          }
-      } else {
-        if (out.n[0].text == null) {
-          for (n = 0; n < out.o.length && out.o[n].text == null; n++) {
-            str += '<del>' + this.escape(out.o[n]) + oSpace[n] + "</del>";
-          }
-        }
-
-        for ( var i = 0; i < out.n.length; i++ ) {
-          if (out.n[i].text == null) {
-            str += '<ins>' + this.escape(out.n[i]) + nSpace[i] + "</ins>";
-          } else {
-            var pre = "";
-
-            for (n = out.n[i].row + 1; n < out.o.length && out.o[n].text == null; n++ ) {
-              pre += '<del>' + this.escape(out.o[n]) + oSpace[n] + "</del>";
-            }
-            str += " " + out.n[i].text + nSpace[i] + pre;
-          }
-        }
-      }
-      
-      return str;
-    },
-    
     randomColor: function() {
-      return "rgb(" + (Math.random() * 100) + "%, " + 
-                  (Math.random() * 100) + "%, " + 
+      return "rgb(" + (Math.random() * 100) + "%, " +
+                  (Math.random() * 100) + "%, " +
                   (Math.random() * 100) + "%)";
     },
-    
+
     diffString2: function( o, n ) {
       o = o.replace(/\s+$/, '');
       n = n.replace(/\s+$/, '');
 
-      var out = this.diff(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
+      var out = this.diff2(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
 
       var oSpace = o.match(/\s+/g);
       if (oSpace == null) {
@@ -473,7 +476,7 @@
           colors[i] = this.randomColor();
 
           if (out.o[i].text != null) {
-              os += '<span style="background-color: ' +colors[i]+ '">' + 
+              os += '<span style="background-color: ' +colors[i]+ '">' +
                     this.escape(out.o[i].text) + oSpace[i] + "</span>";
           } else {
               os += "<del>" + this.escape(out.o[i]) + oSpace[i] + "</del>";
@@ -483,7 +486,7 @@
       var ns = "";
       for (var i = 0; i < out.n.length; i++) {
           if (out.n[i].text != null) {
-              ns += '<span style="background-color: ' +colors[out.n[i].row]+ '">' + 
+              ns += '<span style="background-color: ' +colors[out.n[i].row]+ '">' +
                     this.escape(out.n[i].text) + nSpace[i] + "</span>";
           } else {
               ns += "<ins>" + this.escape(out.n[i]) + nSpace[i] + "</ins>";
@@ -492,54 +495,112 @@
 
       return { o : os , n : ns };
     },
-    
-    diff: function( o, n ) {
+
+		diff: function( partsA, partsB ) {
+			const objA = {};
+			const objB = {};
+
+			partsB.forEach((part, i) => {
+				if (!objB[part]) {
+					objB[part] = { rows: [] };
+				}
+				objB[part].rows.push(i);
+			});
+
+			partsA.forEach((part, i) => {
+				if (!objA[part]) {
+					objA[part] = { rows: [] };
+				}
+				objA[part].rows.push(i);
+			});
+
+			for (const key in objB) {
+				if (objB[key].rows.length === 1 && objA[key] !== undefined && objA[key].rows.length === 1) {
+					partsB[objB[key].rows[0]] = { text: partsB[objB[key].rows[0]], row: objA[key].rows[0] };
+					partsA[objA[key].rows[0]] = { text: partsA[objA[key].rows[0]], row: objB[key].rows[0] };
+				}
+			}
+
+			for (let i = 0; i < partsB.length - 1; i++) {
+				const partB = partsB[i];
+				const nextPartB = partsB[i + 1];
+				if (
+					partB.text &&
+					!nextPartB.text &&
+					partB.row + 1 < partsA.length &&
+					!partsA[partB.row + 1].text &&
+					nextPartB === partsA[partB.row + 1]
+				) {
+					partsB[i + 1] = { text: nextPartB, row: partB.row + 1 };
+					partsA[partB.row + 1] = { text: partsA[partB.row + 1], row: i + 1 };
+				}
+			}
+
+			for (let i = partsB.length - 1; i > 0; i--) {
+				const partB = partsB[i];
+				const prevPartB = partsB[i - 1];
+				if (
+					partB.text &&
+					!prevPartB.text &&
+					partB.row > 0 &&
+					!partsA[partB.row - 1].text &&
+					prevPartB === partsA[partB.row - 1]
+				) {
+					partsB[i - 1] = { text: prevPartB, row: partB.row - 1 };
+					partsA[partB.row - 1] = { text: partsA[partB.row - 1], row: i - 1 };
+				}
+			}
+
+			return { a: partsA, b: partsB };
+		},
+
+    diff2: function( o, n ) {
       var ns = new Object();
       var os = new Object();
-      
+
       for ( var i = 0; i < n.length; i++ ) {
         if ( ns[ n[i] ] == null )
           ns[ n[i] ] = { rows: new Array(), o: null };
         ns[ n[i] ].rows.push( i );
       }
-      
+
       for ( var i = 0; i < o.length; i++ ) {
         if ( os[ o[i] ] == null )
           os[ o[i] ] = { rows: new Array(), n: null };
         os[ o[i] ].rows.push( i );
       }
-      
+
       for ( var i in ns ) {
         if ( ns[i].rows.length == 1 && typeof(os[i]) != "undefined" && os[i].rows.length == 1 ) {
           n[ ns[i].rows[0] ] = { text: n[ ns[i].rows[0] ], row: os[i].rows[0] };
           o[ os[i].rows[0] ] = { text: o[ os[i].rows[0] ], row: ns[i].rows[0] };
         }
       }
-      
+
       for ( var i = 0; i < n.length - 1; i++ ) {
-        if ( n[i].text != null && n[i+1].text == null && n[i].row + 1 < o.length && o[ n[i].row + 1 ].text == null && 
+        if ( n[i].text != null && n[i+1].text == null && n[i].row + 1 < o.length && o[ n[i].row + 1 ].text == null &&
              n[i+1] == o[ n[i].row + 1 ] ) {
           n[i+1] = { text: n[i+1], row: n[i].row + 1 };
           o[n[i].row+1] = { text: o[n[i].row+1], row: i + 1 };
         }
       }
-      
+
       for ( var i = n.length - 1; i > 0; i-- ) {
-        if ( n[i].text != null && n[i-1].text == null && n[i].row > 0 && o[ n[i].row - 1 ].text == null && 
+        if ( n[i].text != null && n[i-1].text == null && n[i].row > 0 && o[ n[i].row - 1 ].text == null &&
              n[i-1] == o[ n[i].row - 1 ] ) {
           n[i-1] = { text: n[i-1], row: n[i].row - 1 };
           o[n[i].row-1] = { text: o[n[i].row-1], row: i - 1 };
         }
       }
-      
+
       return { o: o, n: n };
     }
   };
-  
-  
+
+
   // Diffr will be our object to expose
   var Diffr = function() {};
-  
+
   // htmldiff is the primary function
   Diffr.prototype.htmldiff = function(from, to) {
     return diff(from, to);
@@ -547,8 +608,8 @@
 
   Diffr.prototype.textdiff = function(from, to) {
     return textdiff.diffString(from, to);
-  };  
-  
+  };
+
   // nodejs
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
@@ -557,14 +618,14 @@
     }
     exports.Diffr = Diffr;
   }
-  
+
   // require / amd
   else if (typeof define === 'function' && define.amd) {
     define([], function() {
       return Diffr;
     });
   }
-  
+
   // globals
   else if (typeof window === "object" && typeof window.document === "object") {
     window.Diffr = Diffr;
