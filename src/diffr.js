@@ -497,8 +497,8 @@
     },
 
 		diff: function( partsA, partsB ) {
-			const objA = {};
-			const objB = {};
+			const objA = Object.create(null);
+			const objB = Object.create(null);
 
 			partsB.forEach((part, i) => {
 				if (!objB[part]) {
@@ -555,8 +555,8 @@
 		},
 
     diff2: function( o, n ) {
-      var ns = new Object();
-      var os = new Object();
+      var ns = Object.create(null);
+      var os = Object.create(null);
 
       for ( var i = 0; i < n.length; i++ ) {
         if ( ns[ n[i] ] == null )
