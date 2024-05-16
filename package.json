@@ -1,6 +1,6 @@
 {
     "name": "@soxhub/htmldiff",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "HTML Diffing in JavaScript (CoffeeScript)",
     "main": "./src/diffr.js",
     "scripts": {
