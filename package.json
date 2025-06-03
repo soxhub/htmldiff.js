@@ -4,7 +4,10 @@
     "description": "HTML Diffing in JavaScript (CoffeeScript)",
     "main": "./src/diffr.js",
     "scripts": {
-        "test": "mocha -R min"
+        "test": "npm run test:lint && npm run test:mocha",
+        "test:lint": "eslint .",
+        "test:mocha": "mocha -R min"
+
     },
     "repository": {
         "type": "git",
@@ -18,9 +21,9 @@
         "htmldiff",
         "html"
     ],
-    "dependencies": {},
     "devDependencies": {
         "chai": "*",
+        "eslint": "^9.28.0",
         "mocha": "^8.2.0"
     },
     "author": "The Network Inc.; Kevin Jhangiani (AuditBoard)",
