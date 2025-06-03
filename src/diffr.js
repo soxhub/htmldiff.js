@@ -3,37 +3,37 @@
   /**
     coffeescript compiled js from htmldiff.js npm module
   **/
-  var Match, calculate_operations, consecutive_where, create_index, diff, find_match, find_matching_blocks, html_to_tokens, is_end_of_tag, is_start_of_tag, is_tag, is_whitespace, isnt_tag, op_map, recursively_find_matching_blocks, render_operations, wrap;
+  var calculate_operations, consecutive_where, create_index, diff, find_match, find_matching_blocks, html_to_tokens, op_map, recursively_find_matching_blocks, render_operations, wrap;
 
-  is_end_of_tag = function(char) {
+  const is_end_of_tag = function(char) {
     return char === '>';
   };
 
-  is_start_of_tag = function(char) {
+  const is_start_of_tag = function(char) {
     return char === '<';
   };
 
-  is_whitespace = function(char) {
+  const is_whitespace = function(char) {
     return /^\s+$/.test(char);
   };
 
-  is_tag = function(token) {
+  const is_tag = function(token) {
     return /^\s*<[^>]+>\s*$/.test(token);
   };
 
-  img_tag = function(token) {
+  const img_tag = function(token) {
     return /^\s*<img[^>]+>\s*$/.test(token);
   };
 
-  isnt_tag = function(token) {
+  const isnt_tag = function(token) {
     return !is_tag(token) || img_tag(token);
   };
 
-  is_tag_except_img = function(token) {
+  const is_tag_except_img = function(token) {
     return is_tag(token) && !img_tag(token);
   };
 
-  Match = (function() {
+  const Match = (function() {
     function Match(start_in_before1, start_in_after1, length1) {
       this.start_in_before = start_in_before1;
       this.start_in_after = start_in_after1;
@@ -385,77 +385,77 @@
   **/
 
   var textdiff = {
-		escape: function(str) {
-			return str
-				.replace(/&/g, '&amp;')
-				.replace(/</g, '&lt;')
-				.replace(/>/g, '&gt;')
-				.replace(/"/g, '&quot;');
-		},
+    escape: function(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    },
 
-		diffString: function( a, b ) {
-			const strA = a.replace(/\s+$/, '');
-			const strB = b.replace(/\s+$/, '');
+    diffString: function(a, b) {
+      const strA = a.replace(/\s+$/, '');
+      const strB = b.replace(/\s+$/, '');
 
-			const partsA = (strA && strA.split(/\s+/)) || [];
-			const partsB = (strB && strB.split(/\s+/)) || [];
+      const partsA = (strA && strA.split(/\s+/)) || [];
+      const partsB = (strB && strB.split(/\s+/)) || [];
 
-			const { a: diffA, b: diffB } = this.diff(partsA, partsB);
+      const { a: diffA, b: diffB } = this.diff(partsA, partsB);
 
-			const spaceA = strA.match(/\s+/g) || [];
-			const spaceB = strB.match(/\s+/g) || [];
+      const spaceA = strA.match(/\s+/g) || [];
+      const spaceB = strB.match(/\s+/g) || [];
 
-			spaceA.push('\n');
-			spaceB.push('\n');
+      spaceA.push('\n');
+      spaceB.push('\n');
 
-			const tag = (type) => (str) => `<${type}>${str}</${type}>`;
+      const tag = (type) => (str) => `<${type}>${str}</${type}>`;
 
-			const insTag = tag('ins');
-			const delTag = tag('del');
+      const insTag = tag('ins');
+      const delTag = tag('del');
 
-			if (diffB.length === 0) {
-				return diffA.reduce((str, partA, i) => {
-					const htmlStr = delTag(`${this.escape(partA)}${spaceA[i]}`);
-					return `${str}${htmlStr}`;
-				}, '');
-			}
+      if (diffB.length === 0) {
+        return diffA.reduce((str, partA, i) => {
+          const htmlStr = delTag(`${this.escape(partA)}${spaceA[i]}`);
+          return `${str}${htmlStr}`;
+        }, '');
+      }
 
-			let str = '';
+      let str = '';
 
-			if (!diffB[0].text) {
-				str = diffA.reduce((subStr, partA, i) => {
-					if (partA.text) {
-						return subStr;
-					}
-					return subStr + delTag(`${this.escape(partA)}${spaceA[i]}`);
-				}, '');
-			}
+      if (!diffB[0].text) {
+        str = diffA.reduce((subStr, partA, i) => {
+          if (partA.text) {
+            return subStr;
+          }
+          return subStr + delTag(`${this.escape(partA)}${spaceA[i]}`);
+        }, '');
+      }
 
-			diffB.forEach((partB, i) => {
-				if (!partB.text) {
-					str += insTag(`${this.escape(partB)}${spaceB[i]}`);
-					return;
-				}
-				str += ` ${this.escape(partB.text)}${spaceB[i]}`;
+      diffB.forEach((partB, i) => {
+        if (!partB.text) {
+          str += insTag(`${this.escape(partB)}${spaceB[i]}`);
+          return;
+        }
+        str += ` ${this.escape(partB.text)}${spaceB[i]}`;
 
-				for (let j = partB.row + 1; j < diffA.length && !diffA[j].text; j++) {
-					str += delTag(`${this.escape(diffA[j])}${spaceA[j]}`);
-				}
-			});
-			return str;
+        for (let j = partB.row + 1; j < diffA.length && !diffA[j].text; j++) {
+          str += delTag(`${this.escape(diffA[j])}${spaceA[j]}`);
+        }
+      });
+      return str;
     },
 
     randomColor: function() {
       return "rgb(" + (Math.random() * 100) + "%, " +
-                  (Math.random() * 100) + "%, " +
-                  (Math.random() * 100) + "%)";
+        (Math.random() * 100) + "%, " +
+        (Math.random() * 100) + "%)";
     },
 
-    diffString2: function( o, n ) {
+    diffString2: function(o, n) {
       o = o.replace(/\s+$/, '');
       n = n.replace(/\s+$/, '');
 
-      var out = this.diff2(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
+      var out = this.diff2(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/));
 
       var oSpace = o.match(/\s+/g);
       if (oSpace == null) {
@@ -473,123 +473,123 @@
       var os = "";
       var colors = new Array();
       for (var i = 0; i < out.o.length; i++) {
-          colors[i] = this.randomColor();
+        colors[i] = this.randomColor();
 
-          if (out.o[i].text != null) {
-              os += '<span style="background-color: ' +colors[i]+ '">' +
-                    this.escape(out.o[i].text) + oSpace[i] + "</span>";
-          } else {
-              os += "<del>" + this.escape(out.o[i]) + oSpace[i] + "</del>";
-          }
+        if (out.o[i].text != null) {
+          os += '<span style="background-color: ' + colors[i] + '">' +
+            this.escape(out.o[i].text) + oSpace[i] + "</span>";
+        } else {
+          os += "<del>" + this.escape(out.o[i]) + oSpace[i] + "</del>";
+        }
       }
 
       var ns = "";
       for (var i = 0; i < out.n.length; i++) {
-          if (out.n[i].text != null) {
-              ns += '<span style="background-color: ' +colors[out.n[i].row]+ '">' +
-                    this.escape(out.n[i].text) + nSpace[i] + "</span>";
-          } else {
-              ns += "<ins>" + this.escape(out.n[i]) + nSpace[i] + "</ins>";
-          }
+        if (out.n[i].text != null) {
+          ns += '<span style="background-color: ' + colors[out.n[i].row] + '">' +
+            this.escape(out.n[i].text) + nSpace[i] + "</span>";
+        } else {
+          ns += "<ins>" + this.escape(out.n[i]) + nSpace[i] + "</ins>";
+        }
       }
 
-      return { o : os , n : ns };
+      return { o: os, n: ns };
     },
 
-		diff: function( partsA, partsB ) {
-			const objA = Object.create(null);
-			const objB = Object.create(null);
+    diff: function(partsA, partsB) {
+      const objA = Object.create(null);
+      const objB = Object.create(null);
 
-			partsB.forEach((part, i) => {
-				if (!objB[part]) {
-					objB[part] = { rows: [] };
-				}
-				objB[part].rows.push(i);
-			});
+      partsB.forEach((part, i) => {
+        if (!objB[part]) {
+          objB[part] = { rows: [] };
+        }
+        objB[part].rows.push(i);
+      });
 
-			partsA.forEach((part, i) => {
-				if (!objA[part]) {
-					objA[part] = { rows: [] };
-				}
-				objA[part].rows.push(i);
-			});
+      partsA.forEach((part, i) => {
+        if (!objA[part]) {
+          objA[part] = { rows: [] };
+        }
+        objA[part].rows.push(i);
+      });
 
-			for (const key in objB) {
-				if (objB[key].rows.length === 1 && objA[key] !== undefined && objA[key].rows.length === 1) {
-					partsB[objB[key].rows[0]] = { text: partsB[objB[key].rows[0]], row: objA[key].rows[0] };
-					partsA[objA[key].rows[0]] = { text: partsA[objA[key].rows[0]], row: objB[key].rows[0] };
-				}
-			}
+      for (const key in objB) {
+        if (objB[key].rows.length === 1 && objA[key] !== undefined && objA[key].rows.length === 1) {
+          partsB[objB[key].rows[0]] = { text: partsB[objB[key].rows[0]], row: objA[key].rows[0] };
+          partsA[objA[key].rows[0]] = { text: partsA[objA[key].rows[0]], row: objB[key].rows[0] };
+        }
+      }
 
-			for (let i = 0; i < partsB.length - 1; i++) {
-				const partB = partsB[i];
-				const nextPartB = partsB[i + 1];
-				if (
-					partB.text &&
-					!nextPartB.text &&
-					partB.row + 1 < partsA.length &&
-					!partsA[partB.row + 1].text &&
-					nextPartB === partsA[partB.row + 1]
-				) {
-					partsB[i + 1] = { text: nextPartB, row: partB.row + 1 };
-					partsA[partB.row + 1] = { text: partsA[partB.row + 1], row: i + 1 };
-				}
-			}
+      for (let i = 0; i < partsB.length - 1; i++) {
+        const partB = partsB[i];
+        const nextPartB = partsB[i + 1];
+        if (
+          partB.text &&
+          !nextPartB.text &&
+          partB.row + 1 < partsA.length &&
+          !partsA[partB.row + 1].text &&
+          nextPartB === partsA[partB.row + 1]
+        ) {
+          partsB[i + 1] = { text: nextPartB, row: partB.row + 1 };
+          partsA[partB.row + 1] = { text: partsA[partB.row + 1], row: i + 1 };
+        }
+      }
 
-			for (let i = partsB.length - 1; i > 0; i--) {
-				const partB = partsB[i];
-				const prevPartB = partsB[i - 1];
-				if (
-					partB.text &&
-					!prevPartB.text &&
-					partB.row > 0 &&
-					!partsA[partB.row - 1].text &&
-					prevPartB === partsA[partB.row - 1]
-				) {
-					partsB[i - 1] = { text: prevPartB, row: partB.row - 1 };
-					partsA[partB.row - 1] = { text: partsA[partB.row - 1], row: i - 1 };
-				}
-			}
+      for (let i = partsB.length - 1; i > 0; i--) {
+        const partB = partsB[i];
+        const prevPartB = partsB[i - 1];
+        if (
+          partB.text &&
+          !prevPartB.text &&
+          partB.row > 0 &&
+          !partsA[partB.row - 1].text &&
+          prevPartB === partsA[partB.row - 1]
+        ) {
+          partsB[i - 1] = { text: prevPartB, row: partB.row - 1 };
+          partsA[partB.row - 1] = { text: partsA[partB.row - 1], row: i - 1 };
+        }
+      }
 
-			return { a: partsA, b: partsB };
-		},
+      return { a: partsA, b: partsB };
+    },
 
-    diff2: function( o, n ) {
+    diff2: function(o, n) {
       var ns = Object.create(null);
       var os = Object.create(null);
 
-      for ( var i = 0; i < n.length; i++ ) {
-        if ( ns[ n[i] ] == null )
-          ns[ n[i] ] = { rows: new Array(), o: null };
-        ns[ n[i] ].rows.push( i );
+      for (var i = 0; i < n.length; i++) {
+        if (ns[n[i]] == null)
+          ns[n[i]] = { rows: new Array(), o: null };
+        ns[n[i]].rows.push(i);
       }
 
-      for ( var i = 0; i < o.length; i++ ) {
-        if ( os[ o[i] ] == null )
-          os[ o[i] ] = { rows: new Array(), n: null };
-        os[ o[i] ].rows.push( i );
+      for (var i = 0; i < o.length; i++) {
+        if (os[o[i]] == null)
+          os[o[i]] = { rows: new Array(), n: null };
+        os[o[i]].rows.push(i);
       }
 
-      for ( var i in ns ) {
-        if ( ns[i].rows.length == 1 && typeof(os[i]) != "undefined" && os[i].rows.length == 1 ) {
-          n[ ns[i].rows[0] ] = { text: n[ ns[i].rows[0] ], row: os[i].rows[0] };
-          o[ os[i].rows[0] ] = { text: o[ os[i].rows[0] ], row: ns[i].rows[0] };
+      for (var i in ns) {
+        if (ns[i].rows.length == 1 && typeof (os[i]) != "undefined" && os[i].rows.length == 1) {
+          n[ns[i].rows[0]] = { text: n[ns[i].rows[0]], row: os[i].rows[0] };
+          o[os[i].rows[0]] = { text: o[os[i].rows[0]], row: ns[i].rows[0] };
         }
       }
 
-      for ( var i = 0; i < n.length - 1; i++ ) {
-        if ( n[i].text != null && n[i+1].text == null && n[i].row + 1 < o.length && o[ n[i].row + 1 ].text == null &&
-             n[i+1] == o[ n[i].row + 1 ] ) {
-          n[i+1] = { text: n[i+1], row: n[i].row + 1 };
-          o[n[i].row+1] = { text: o[n[i].row+1], row: i + 1 };
+      for (var i = 0; i < n.length - 1; i++) {
+        if (n[i].text != null && n[i + 1].text == null && n[i].row + 1 < o.length && o[n[i].row + 1].text == null &&
+          n[i + 1] == o[n[i].row + 1]) {
+          n[i + 1] = { text: n[i + 1], row: n[i].row + 1 };
+          o[n[i].row + 1] = { text: o[n[i].row + 1], row: i + 1 };
         }
       }
 
-      for ( var i = n.length - 1; i > 0; i-- ) {
-        if ( n[i].text != null && n[i-1].text == null && n[i].row > 0 && o[ n[i].row - 1 ].text == null &&
-             n[i-1] == o[ n[i].row - 1 ] ) {
-          n[i-1] = { text: n[i-1], row: n[i].row - 1 };
-          o[n[i].row-1] = { text: o[n[i].row-1], row: i - 1 };
+      for (var i = n.length - 1; i > 0; i--) {
+        if (n[i].text != null && n[i - 1].text == null && n[i].row > 0 && o[n[i].row - 1].text == null &&
+          n[i - 1] == o[n[i].row - 1]) {
+          n[i - 1] = { text: n[i - 1], row: n[i].row - 1 };
+          o[n[i].row - 1] = { text: o[n[i].row - 1], row: i - 1 };
         }
       }
 
@@ -599,7 +599,7 @@
 
 
   // Diffr will be our object to expose
-  var Diffr = function() {};
+  var Diffr = function() { };
 
   // htmldiff is the primary function
   Diffr.prototype.htmldiff = function(from, to) {
