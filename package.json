@@ -7,7 +7,6 @@
         "test": "npm run test:lint && npm run test:mocha",
         "test:lint": "eslint .",
         "test:mocha": "mocha -R min"
-
     },
     "repository": {
         "type": "git",
@@ -22,9 +21,9 @@
         "html"
     ],
     "devDependencies": {
-        "chai": "*",
+        "chai": "^6.2.2",
         "eslint": "^9.28.0",
-        "mocha": "^8.2.0"
+        "mocha": "^11.3.0"
     },
     "author": "The Network Inc.; Kevin Jhangiani (AuditBoard)",
     "license": "MIT (Expat)"
