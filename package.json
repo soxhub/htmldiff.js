@@ -28,7 +28,8 @@
     "author": "The Network Inc.; Kevin Jhangiani (AuditBoard)",
     "license": "MIT",
     "publishConfig": {
-        "registry": "https://npm.pkg.github.com",
-        "access": "restricted"
+        "registry": "https://registry.npmjs.org/",
+        "access": "public",
+        "provenance": true
     }
 }
