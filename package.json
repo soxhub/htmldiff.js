@@ -1,6 +1,6 @@
 {
     "name": "@soxhub/htmldiff",
-    "version": "0.0.6",
+    "version": "0.0.8",
     "description": "HTML Diffing in JavaScript (CoffeeScript)",
     "main": "./src/diffr.js",
     "scripts": {
@@ -26,5 +26,9 @@
         "mocha": "^11.3.0"
     },
     "author": "The Network Inc.; Kevin Jhangiani (AuditBoard)",
-    "license": "MIT (Expat)"
+    "license": "MIT",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com",
+        "access": "restricted"
+    }
 }
